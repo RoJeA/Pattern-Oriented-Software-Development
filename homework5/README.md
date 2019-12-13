@@ -2,133 +2,113 @@
 #### Fall, 2019
 #### Dept. of Computer Science and Information Engineering
 #### Taipei Tech
+#### Homework 5
 
-#### Homework 4
+# Update
+23 Oct 2019
+
+#### Homework 5
 
 # Purpose of the homework:
-  Practice composite pattern.
 
-  You can reference Professor's website https://ssl-gitlab.csie.ntut.edu.tw/yccheng/posd2019f to implement following methods
-  
-  (You can modify method or add new method by yourself)
-  
-  Don't use `global function or global variable`!
-  
-  1. `name()`  
-  
-  2. `findNode()` 
-  
-  3. `listNode()` 
+####  Use the [course material](https://ssl-gitlab.csie.ntut.edu.tw/yccheng/posd2019f) to implement Iterator Pattern.
 
-      The `findNode()` method is just like `find -name XXXX` command in linux.
-      
-      The `listNode()` method is just like `ls` command in linux.
-  
-  
+####  Change the data structure `std::vector<Node *>`  into `std::map<string, Node *>` and refactor related member functions.
 # Requirements:
- 1. You can reference Professor's website https://ssl-gitlab.csie.ntut.edu.tw/yccheng/posd2019f
+ 1. Add Test Setup and Test Teardown in UnitTest.
+ 2. In Folder class, you must change the the data structure `std::vector<Node *>` into `std::map<string,Node *>` and make sure member functions in Folder class work correctly afterwards.
  
- 2. Give you `path` that you should check the node is exist or not 
+    **Note:** You must use filename as your key in `std::map<string, Node *>`
  
-    If it is not exist you should throw "Node is not exist!"
-    
-     For example:
+ 3. Create the Iterator class in iterator.h . Move innerclass Iterator from class Node to iterator.h.
+    In iterator.h, you can use following code and #include guard.
+    You should not include node.h to avoid some condition. Write 'class Node' instead.
 
-        Node * a_out = new File("test/TA_folder/hw/Not_exist_file");
-    
-    If new File("XXXX")/new Folder("XXX") you should check the node is file/folder
-    
-    If it is not file you should throw "It is not File!"
-    
-    For example:
+        class Node;
+        class Iterator
+        {
+        public:
+          virtual void first() = 0;
+          virtual Node* currentItem() = 0;
+          virtual void next() = 0;
+          virtual bool isDone() = 0;
+        };
 
-        Node * a_out = new File("test/TA_folder/hw/TA_Folder");
-    
-    If it is not folder you should throw "It is not Folder!"
-    
-    For example:
-    
-        Node * a_out = new Folder("test/TA_folder/hw/TA_File");
- 3. Implement `name()` and `findNode()` and `listNode()` method for File, Folder, Node class.
-
-        std::string name()
-        {
-              // For example path:"test/TA_folder/hello.txt"
-              // "hello.txt" is name
-              // Return "hello.txt"
-        }
-        
-        std::string findNode(std::string name)
-        {
-              // implementation findNode
-              // folder->findNode(name) that should find all nodes(include child nodes and all offspring) under it. 
-              // file->findNode(name) that should find itself.
-              // if find two nodes or more than two nodes.
-              // Result should be separated by '\n'. 
-              
-        }
-        
-        std::string listNode()
-        {
-              // implementation list child Node and Sort by dictionary
-              // Result should be separated by space
-              // For example: 
-              // Folder contains childnode "a.out" and "TA_folder" and "hello.txt"
-              // It should return "TA_folder a.out hello.txt"
-              // If node is file, it can't listNode.
-              // It should throw "Not a directory"
-              // For Example: TA_file->listNode()
+ 4. Modify createIterator() function to be `virtual Iterator *createIterator() = 0;` in  `Node` class
+ 5. Create the inner class `FolderIterator`  in folder class and `FolderIterator` should inherit `Iterator`
+ 
+        class FolderIterator : public XXXX
+         {
+          public:
+            FolderIterator(Folder * f){}
+            void first()
+            {
+              // initialization
+            }
+            Node* currentItem()
+            {
+              // if iterator is to the end that it should throw string "No current item!"
+              // if iterator is not to the end that it should return current node
+            }
+            void next()
+            {
+              // if iterator is to the end that it should throw string "Moving past the end!"
+              // if iterator is not to the end that it should add 1
+            }
+            bool isDone()
+            {
+              // return iterator is to the end or not?
+            }
         }
 
-      **Note**  
-      `File->findNode(std::string nodeName)` should return the file name if the file was found.
-
-            ASSERT.EQ("a.out",a_out->findNode("a.out"));
-
+ 6. Create NullIterator in null_iterator.h and it should inherit `Iterator`, where the member function `isDone()` must return true.
+    Remove innerclass NullIterator in Node class. 
  
- 4. **There is a situation you should be known. The fileSystem can have the same file/folder name in the different folder.**
- 
-    **Your answer should be all the paths seperated by '\n'. Just like linux find multipath.**
+    **Note:** The File class call createIterator() must return NullIterator.
 
-      *Example: `a.out` in different folders*
-
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *test_data/`a.out`*
-
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*test_data/folder/`a.out`*
-
-    And your answer of  `test_data->findNode('a.out')` should be:
-
-        ./a.out\n./folder/a.out
-
-    And the assertion should be:
-
-        ASSERT.EQ("./a.out\n./folder/a.out", test_data->findNode("a.out"));
-
-      Note
-
-      The `findNode()` result is same as using the `find -name a.out` command in linux.
- 
- 5. listnode() Your answer should be all Nodenames seperated by ' '. Just like `ls` command in linux.
+        class NullIterator:public XXX
+        {
+          public:
+            void first(){
+              //throw string "no child member"
+            }
+            Node* currentItem(){
+              //throw string "no child member"
+            }
+            void next() {
+              //throw string "no child member"
+            }
+            bool isDone(){
+              return true;
+            }
+        };
+  
+ 7. Create utilities.h and class Utilities
     
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; test_data/`a.out`
-
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;test_data/`TA_folder`
+        class Utilities 
+        {
+            public:
+                string listNode(Node* node)
+                {
+                    // You should use iterator pattern to access node in folder!
+                    // You can use dynamic_cast if you need
+                    // If node is file that it should throw string "Not a directory"
+                    // This function is same as Hw4 listNode()
+                }
     
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;test_data/`hello.txt`
-    
-    and your answer of  `test_data->listNode()` should be:
-
-        TA_folder a.out hello.txt
-
-    And the assertion should be:
-
-        ASSERT.EQ("TA_folder a.out hello.txt", test_data->listNode());
-    
- 
- 5. Write the corresponding makefile to generate executable file which named **`ut_all`** in bin folder.
+                string findNode(Node* node, string name)
+                {
+                    // You should use iterator pattern to access node in folder!
+                    // You can use dynamic_cast if you need
+                    // This function is same as Hw4 findNode()
+                }
+        };
+  
+            
+ 8.Write the corresponding makefile to generate executable file which named `bin/ut_all` in bin folder.
 
 #### File structure:
-`ut_main.cpp` should include "ut_node.h"
+`ut_main.cpp` should include "ut_fs.h"
 
 ```
 - bin
@@ -137,10 +117,13 @@
     - file.h
     - folder.h
     - node.h
+    - iterator.h
+    - null_iterator.h
+    - utilities.h
 - test
     - test_folder
     - ut_main.cpp
-    - ut_node.h
+    - ut_fs.h
 makefile
 ```
 
@@ -149,7 +132,7 @@ makefile
 TA assigned 12 test cases in CI.
 
 # Deadline
-11:59 p.m. 17 oct 2019
+11:59 p.m. 30 Oct 2019
 
 # Note
 Make sure your all tests pass on your local machine. Then you can push to Gitlab and see the report on Jenkins.
